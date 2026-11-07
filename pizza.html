@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>BIOZOOM – Page 2</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    *{margin:0;padding:0;box-sizing:border-box}
+
+    body{
+      font-family:'Prompt',sans-serif;
+      min-height:100vh;
+      display:flex; align-items:center; justify-content:flex-end;
+      background:url("assets/bg.png") no-repeat center center/cover,
+                 linear-gradient(105deg,#66cfc8 0 38%,#fdf4bf 38% 100%);
+    }
+
+    .stage{
+      position:relative;
+      width:min(1280px,100%);
+      height:100vh;
+      border-radius:clamp(20px,3vw,36px);
+      overflow:hidden;
+      margin-left:auto;
+    }
+
+    /* logo: click to go home */
+    .logo{
+      position:absolute;
+      top:clamp(12px,1.6vw,24px);
+      left:clamp(12px,1.8vw,28px);
+      font-weight:800;
+      letter-spacing:2px;
+      text-transform:uppercase;
+      font-size:clamp(42px,6vw,68px);
+      color:rgba(255,255,255,.32);
+      cursor:pointer;
+      -webkit-user-select:none;
+      user-select:none;
+      z-index:10;
+    }
+
+    .human{
+      position:absolute;
+      right:clamp(30px,4vw,40px);
+      bottom:-20px;
+      display:block;
+      width:clamp(350px, 38vw, 440px);
+      max-height:100%;
+      object-fit:contain;
+      filter:drop-shadow(0 16px 28px rgba(0,0,0,.18));
+      z-index:2;
+      pointer-events:none;
+    }
+
+    /* draggable pizza */
+    #food{
+      position:absolute;
+      width:80px;      /* was clamp(80px,8vw,10px): max < min, so it always rendered 80px */
+      left:clamp(40px,6vw,80px);
+      bottom:240px;    /* was clamp(240px,18vh,180px): same issue, always 240px */
+      cursor:grab;
+      transform:translate3d(0,0,0);
+      will-change:transform;
+      touch-action:none;
+      z-index:4;
+      transition:filter .2s;
+    }
+    #food.dragging{ cursor:grabbing; filter:none; }
+    #food.resetting{ transition: transform .3s ease, filter .2s; }
+
+    /* instruction */
+    .hint{
+      position:absolute;
+      top:clamp(78px,10vw,118px);
+      left:clamp(12px,1.8vw,28px);
+      max-width:min(300px,60vw);
+      background:rgba(255,255,255,.92);
+      color:#0b4b82;
+      padding:12px 18px;
+      border-radius:18px;
+      box-shadow:0 8px 20px rgba(0,0,0,.14);
+      z-index:10;
+      pointer-events:none;
+    }
+    .hint b{display:block;font-size:clamp(20px,2.4vw,26px);line-height:1.3}
+    .hint span{display:block;font-size:15px;color:#4a6a8a;margin-top:2px}
+
+    body.has-bar{padding-top:0}
+
+    @media (max-width: 860px){
+      body{ justify-content:flex-end; }
+      .stage{ width:100%; height:100vh; margin-left:auto; border-radius:0; }
+      .human{ right:clamp(8px,3vw,16px); width:min(350px, 62vw); max-height:none; }
+    }
+  </style>
+</head>
+<body>
+  <main class="stage" id="stage">
+    <div class="hint"><b>ป้อนพิซซ่าเข้าปาก</b><span>ลากพิซซ่าไปวางที่ตัวคน</span></div>
+
+    <img src="assets/aaa.png" alt="Digestive System" id="human" class="human"/>
+    <img src="assets/pizza-2.png" id="food" alt="Pizza">
+  </main>
+
+  <script src="js/nav.js"></script>
+  <script>
+  (function(){
+    const stage = document.getElementById('stage');
+    const food  = document.getElementById('food');
+    const human = document.getElementById('human');
+
+    const normalSrc = 'assets/pizza-2.png';
+    const afterClickSrc = 'assets/pizza.png';
+
+    let dragging = false;
+    let startX = 0, startY = 0;
+    let offX = 0, offY = 0;
+    let stageRect = null;
+
+    function resetPizza(){
+      food.classList.add("resetting");
+      food.src = normalSrc;
+      offX = 0;
+      offY = 0;
+      food.style.transform = "translate(0,0)";
+      setTimeout(()=> food.classList.remove("resetting"), 300);
+    }
+
+    function pointerDown(e){
+      // swap image when dragging starts
+      if (food.src.indexOf('pizza.png') === -1) food.src = afterClickSrc;
+
+      dragging = true;
+      food.classList.add('dragging');
+      stageRect = stage.getBoundingClientRect();
+
+      startX = e.clientX - stageRect.left - offX;
+      startY = e.clientY - stageRect.top  - offY;
+
+      e.preventDefault();
+    }
+
+    function pointerMove(e){
+      if(!dragging) return;
+      offX = e.clientX - stageRect.left - startX;
+      offY = e.clientY - stageRect.top  - startY;
+      food.style.transform = `translate(${offX}px, ${offY}px)`;
+    }
+
+    function pointerUp(){
+      // FIX: ignore pointerup events that did not come from dragging the pizza
+      // (before, tapping anywhere could trigger a redirect on small screens)
+      if(!dragging) return;
+      dragging = false;
+      food.classList.remove('dragging');
+
+      const f = food.getBoundingClientRect();
+      const h = human.getBoundingClientRect();
+
+      // FIX: use the pizza's center point instead of any edge overlap
+      const cx = f.left + f.width / 2;
+      const cy = f.top  + f.height / 2;
+      const inside = cx > h.left && cx < h.right && cy > h.top && cy < h.bottom;
+
+      if(inside){
+        window.location.href = "page.html";
+      } else {
+        resetPizza();
+      }
+    }
+
+    window.goHome = function(){
+      window.location.href = "index.html";
+    }
+
+    food.addEventListener('pointerdown', pointerDown);
+    window.addEventListener('pointermove', pointerMove);
+    window.addEventListener('pointerup', pointerUp);
+    window.addEventListener('pointercancel', pointerUp);
+
+    window.addEventListener('load', resetPizza);
+  })();
+  </script>
+</body>
+</html>

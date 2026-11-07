@@ -1,0 +1,51 @@
+/* BIOZOOM shared styles */
+*{margin:0;padding:0;box-sizing:border-box}
+
+body{
+  font-family:'Prompt',sans-serif;
+  min-height:100vh;
+  display:flex;justify-content:center;align-items:center;
+  padding:16px;
+  /* gradient is a fallback if assets/bg.png is missing */
+  background:url("../assets/bg.png") no-repeat center center/cover,
+             linear-gradient(105deg,#66cfc8 0 38%,#fdf4bf 38% 100%);
+}
+
+/* ===== HOME ===== */
+.container{text-align:center;width:100%;max-width:480px;padding:20px;position:relative}
+header h1{font-size:4rem;font-weight:800;letter-spacing:2px}
+header h1 span:nth-child(1),header h1 span:nth-child(4),header h1 span:nth-child(6),header h1 span:nth-child(7){color:#0b4b82}
+header h1 span:nth-child(2){color:#f58634}
+header h1 span:nth-child(3),header h1 span:nth-child(5){color:#f44336}
+.human{width:100%;height:auto;max-width:250px;display:block;margin:0 auto -10px}
+.start-btn{position:relative;z-index:5;background:#ff9f3f;color:#fff;font:bold 1.4rem 'Prompt',sans-serif;padding:14px 40px;border:none;border-radius:50px;cursor:pointer;box-shadow:0 4px 0 #d37a1f;transition:all .2s ease-in-out}
+.start-btn:hover{transform:translateY(-3px);box-shadow:0 6px 0 #b3621d}
+.icon{position:absolute;width:50px;height:auto}
+.apple{top:190px;left:10px}.burger{top:260px;right:30px}.bread{top:400px;left:10px}
+
+/* ===== KNOWLEDGE BOX ===== */
+.card{width:95%;max-width:600px;background:#ffd76a;border-radius:20px;padding:30px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.15)}
+.card h1{font-size:2.2rem;color:#2d2d82;font-weight:900;margin-bottom:20px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:16px}
+.box{border-radius:14px;padding:20px 10px;font-weight:bold;font-size:1rem;color:#222;box-shadow:0 4px 12px rgba(0,0,0,.1);transition:transform .2s;cursor:pointer;text-decoration:none;display:block}
+.box:hover{transform:translateY(-4px)}
+.box:nth-child(1){background:#ffe9a7}.box:nth-child(2){background:#ffb9b9}.box:nth-child(3){background:#a7d8ff}
+.box:nth-child(4){background:#b9ffcb}.box:nth-child(5){background:#ffd6a7}.box:nth-child(6){background:#d2b9ff}.box:nth-child(7){background:#ffc4e1}
+
+/* ===== FACT + QUIZ ===== */
+.knowledge-box,.quiz-box{background:rgba(255,255,255,.88);border-radius:20px;padding:24px;box-shadow:0 12px 30px rgba(0,0,0,.16)}
+.knowledge-box{width:min(500px,92vw);text-align:left}
+.quiz-box{width:min(400px,92vw);text-align:center}
+.title{background:#bce4ff;padding:14px;border-radius:12px;font-weight:800;font-size:22px;margin-bottom:20px;color:#123;text-align:center}
+.fact{font-size:17px;line-height:1.7;margin-bottom:20px;color:#222;white-space:pre-line}
+.video-box video{width:100%;max-height:260px;border-radius:16px;object-fit:cover;background:#000}
+.nav-container{margin-top:16px;text-align:center}
+.nav-btn{margin:6px;padding:10px 18px;border:none;border-radius:20px;font:800 1rem 'Prompt',sans-serif;background:#0b4b82;color:#fff;cursor:pointer}
+.nav-btn:hover{background:#ff6f61}
+.question{font-size:18px;margin-bottom:20px;color:#123;white-space:pre-line}
+.option{display:block;width:100%;margin:10px 0;padding:12px;border-radius:24px;font:600 16px 'Prompt',sans-serif;border:none;cursor:pointer;background:#0b4b82;color:#fff;transition:transform .08s ease}
+.option:active{transform:scale(.97)}
+.next-btn{display:none;margin-top:16px;padding:10px 18px;border:none;border-radius:20px;font:800 1rem 'Prompt',sans-serif;background:#ff6f61;color:#fff;cursor:pointer}
+.score{margin-top:12px;font-weight:600;color:#0b4b82}
+.timer{margin-top:10px;font-weight:700;color:#e74c3c}
+

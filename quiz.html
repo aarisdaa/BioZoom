@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BIOZOOM – Quiz</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <div class="quiz-box" id="quizBox">
+    <div class="title">DIGESTIVE QUIZ</div>
+    <div class="question"></div>
+    <button class="option" aria-label="ตัวเลือก 1"></button>
+    <button class="option" aria-label="ตัวเลือก 2"></button>
+    <button class="option" aria-label="ตัวเลือก 3"></button>
+    <button class="option" aria-label="ตัวเลือก 4"></button>
+    <button class="next-btn" id="nextBtn">ถัดไป →</button>
+    <div class="score" id="scoreBox">คะแนน: 0</div>
+    <div class="timer" id="timerBox"></div>
+  </div>
+
+<script src="js/data.js"></script>
+<div id="feedback"></div>
+<script src="js/feedback.js"></script>
+<script src="js/nav.js"></script>
+<script>
+const TIME_LIMIT = 20;
+let current = 0, score = 0, timer, timeLeft = TIME_LIMIT;
+
+const questionEl = document.querySelector(".question");
+const optionEls = document.querySelectorAll(".option");
+const nextBtn = document.getElementById("nextBtn");
+const scoreBox = document.getElementById("scoreBox");
+const timerBox = document.getElementById("timerBox");
+
+function renderTimer(){ timerBox.textContent = "เหลือเวลา: " + timeLeft + " วิ"; }
+
+function startTimer(){
+  clearInterval(timer);
+  timeLeft = TIME_LIMIT;
+  renderTimer();
+  timer = setInterval(() => {
+    timeLeft--;
+    renderTimer();
+    if (timeLeft <= 0){ clearInterval(timer); timeUp(); }
+  }, 1000);
+}
+
+function timeUp(){
+  const correct = QUIZ_HARD[current].ans;
+  revealAnswer(optionEls, correct, null);
+  showFeedback(false, "หมดเวลา");
+  nextBtn.style.display = "inline-block";
+}
+
+function loadQuiz(){
+  const q = QUIZ_HARD[current];
+  questionEl.textContent = (current + 1) + ". " + q.q;
+  optionEls.forEach((btn, i) => {
+    btn.textContent = q.opts[i] || "";
+    btn.style.display = q.opts[i] ? "block" : "none";
+    btn.disabled = false;
+    btn.style.background = "#0b4b82";
+    btn.onclick = () => checkAnswer(btn, q.ans);
+  });
+  hideFeedback();
+  nextBtn.style.display = "none";
+  startTimer();
+}
+
+function checkAnswer(btn, correct){
+  clearInterval(timer);
+  const ok = btn.textContent === correct;
+  revealAnswer(optionEls, correct, btn);
+  if (ok){
+    score++;
+    scoreBox.textContent = "คะแนน: " + score;
+  }
+  showFeedback(ok, ok ? "ถูกต้อง" : "ยังไม่ถูก");
+  nextBtn.style.display = "inline-block";
+}
+
+nextBtn.addEventListener("click", () => {
+  current++;
+  if (current < QUIZ_HARD.length){
+    loadQuiz();
+  } else {
+    questionEl.textContent = "จบควิซแล้ว\nคุณได้ " + score + " / " + QUIZ_HARD.length + " คะแนน";
+    optionEls.forEach(b => b.style.display = "none");
+    hideFeedback();
+    nextBtn.style.display = "none";
+    timerBox.style.display = "none";
+    const homeBtn = document.createElement("button");
+    homeBtn.textContent = "กลับหน้าแรก";
+    homeBtn.className = "nav-btn";
+    homeBtn.onclick = () => location.href = "index.html";
+    document.getElementById("quizBox").appendChild(homeBtn);
+  }
+});
+
+loadQuiz();
+</script>
+</body>
+</html>

@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BIOZOOM – Digestive Play</title>
+  <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+  <style>.quiz-box{display:none}</style>
+</head>
+<body>
+  <div class="knowledge-box" id="factBox">
+    <div class="title">DIGESTIVE FACT</div>
+    <div class="fact" id="fact"></div>
+    <div class="video-box">
+      <video id="video" controls playsinline muted>
+        <source type="video/mp4">
+        เบราว์เซอร์นี้ไม่รองรับวิดีโอ
+      </video>
+    </div>
+    <div class="nav-container">
+      <button class="nav-btn" onclick="location.href='index.html'">← ก่อนหน้า</button>
+      <button class="nav-btn" onclick="goQuiz()">ถัดไป →</button>
+    </div>
+  </div>
+
+  <div class="quiz-box" id="quizBox">
+    <div class="title">DIGESTIVE QUIZ</div>
+    <div class="question"></div>
+    <button class="option"></button>
+    <button class="option"></button>
+    <button class="option"></button>
+    <div style="margin-top:16px;">
+      <button class="nav-btn" onclick="showFact(factIndex)">← ย้อนกลับ</button>
+      <button class="next-btn" id="nextBtn">ถัดไป →</button>
+    </div>
+  </div>
+
+<script src="js/data.js"></script>
+<div id="feedback"></div>
+<script src="js/feedback.js"></script>
+<script src="js/nav.js"></script>
+<script>
+const QUIZ_PER_FACT = 3;
+let factIndex = 0, quizIndex = 0;
+
+const factBox = document.getElementById("factBox");
+const factEl = document.getElementById("fact");
+const videoEl = document.getElementById("video");
+const quizBox = document.getElementById("quizBox");
+const questionEl = quizBox.querySelector(".question");
+const optionEls = quizBox.querySelectorAll(".option");
+const nextBtn = document.getElementById("nextBtn");
+
+function showFact(i){
+  factIndex = i;
+  factEl.textContent = FACTS[i].fact;
+  videoEl.querySelector("source").src = FACTS[i].video;
+  videoEl.load();
+  factBox.style.display = "block";
+  quizBox.style.display = "none";
+}
+
+function goQuiz(){
+  quizIndex = factIndex * QUIZ_PER_FACT;
+  loadQuiz();
+  factBox.style.display = "none";
+  quizBox.style.display = "block";
+}
+
+function loadQuiz(){
+  const q = QUIZ[quizIndex];
+  questionEl.textContent = q.q;
+  optionEls.forEach((btn, i) => {
+    btn.textContent = q.opts[i] || "";
+    btn.style.display = q.opts[i] ? "block" : "none";
+    btn.disabled = false;
+    btn.style.background = "#0b4b82";
+    btn.onclick = () => checkAnswer(btn, q.ans);
+  });
+  hideFeedback();
+  nextBtn.style.display = "none";
+}
+
+function checkAnswer(btn, correct){
+  const ok = btn.textContent === correct;
+  revealAnswer(optionEls, correct, btn);
+  showFeedback(ok, ok ? "ถูกต้อง" : "ยังไม่ถูก");
+  nextBtn.style.display = "inline-block";
+}
+
+nextBtn.addEventListener("click", () => {
+  quizIndex++;
+  if (quizIndex % QUIZ_PER_FACT === 0){
+    if (factIndex < FACTS.length - 1){
+      showFact(factIndex + 1);
+    } else {
+      questionEl.textContent = "จบทั้งหมดแล้ว";
+      optionEls.forEach(b => b.style.display = "none");
+      hideFeedback();
+      nextBtn.style.display = "none";
+    }
+  } else {
+    loadQuiz();
+  }
+});
+
+// open the fact given in the URL (?fact=0..6)
+const idx = parseInt(new URLSearchParams(location.search).get("fact"));
+showFact(!isNaN(idx) && idx >= 0 && idx < FACTS.length ? idx : 0);
+</script>
+</body>
+</html>
